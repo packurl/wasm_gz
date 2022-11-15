@@ -1,0 +1,22 @@
+[package]
+name = "zopfli"
+version = "0.1.0"
+authors = ["programingjd"]
+edition = "2021"
+
+[lib]
+crate-type = ["cdylib","rlib"]
+
+[dependencies.wasm-bindgen]
+version = "0.2"
+
+[dependencies.zopfli]
+version = "0.7"
+
+[dependencies.inflate]
+version = "0.4"
+
+[profile.release]
+debug = false
+opt-level = "s"
+lto = true
