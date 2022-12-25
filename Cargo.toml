@@ -1,6 +1,6 @@
 [package]
 name = "zopfli"
-version = "0.2.0"
+version = "0.3.0"
 authors = ["programingjd"]
 edition = "2021"
 
@@ -13,8 +13,14 @@ version = "0.2"
 [dependencies.zopfli]
 version = "0.7"
 
-[dependencies.inflate]
-version = "0.4"
+#[dependencies.inflate]
+#version = "0.4"
+#[dependencies.libflate]
+#version = "1.2"
+#[dependencies.flate2]
+#version = "1.0"
+[dependencies.miniz_oxide]
+version = "0.6"
 
 [profile.release]
 debug = false
