@@ -19,7 +19,7 @@ const src=name=>`(async()=>{
 })();`
 const fns=['inflate','deflate'];
 const workers=new Map(await Promise.all(fns.map(it=>new Promise(r=>{
-  const worker=new Worker(URL.createObjectURL(new Blob([src(it)],{type:'application/javascript'})));
+  const worker=new Worker(URL.createObjectURL(new Blob([src(it)],{type:'application/javascript'})),{type:'module'});
   worker.onmessage=msg=>{
     if(msg.data==='ready'){
       worker.onmessage=null;

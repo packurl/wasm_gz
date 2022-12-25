@@ -18,7 +18,7 @@ const src=()=>`(async()=>{
   postMessage('ready');
 })();`
 const worker=await new Promise(r=>{
-  const worker=new Worker(URL.createObjectURL(new Blob([src()],{type:'application/javascript'})));
+  const worker=new Worker(URL.createObjectURL(new Blob([src()],{type:'application/javascript'})),{type:'module'});
   worker.onmessage=msg=>{
     if(msg.data==='ready'){
       worker.onmessage=null;
