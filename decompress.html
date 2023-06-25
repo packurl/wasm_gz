@@ -50,8 +50,6 @@ main.classList.add('ready');
   },false);
 });
 const dragListener=e=>{
-  const file=e.dataTransfer.files.item(0);
-  if(!file.name.endsWith('.gz')) return e.preventDefault();
   e.dataTransfer.dropEffect='copy';
   document.body.classList.add('dragover');
 };
