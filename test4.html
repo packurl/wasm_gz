@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Zopfli on a file</title>
+<title>Gzip on random data</title>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
 html{height:100%;font:4vmin monospace;background:#222;color:#eee}
@@ -23,25 +23,26 @@ main>div{height:2rem}
 </main>
 </body>
 <script type="module">
-const encMod=import('./zopfli_enc.mjs');
+const encMod=import('./gzip.mjs');
 const decMod=import('./gunzip.mjs');
 const divs=[...document.querySelectorAll('main>div')];
-divs[0].textContent='Fetching data...';
-const original=new Uint8Array(await(await fetch('./zopfli.wasm')).arrayBuffer());
-divs[0].textContent+=`done (${original.byteLength})`;
+divs[0].textContent='Generating 10 kiB of data...';
+const original=new Uint8Array(10_000);
+crypto.getRandomValues(original);
+divs[0].textContent+='done';
 divs[1].textContent='Initializing compressor...';
-const {zopfli}=await encMod;
+const {gzip}=await encMod;
 const {gunzip}=await decMod;
 divs[1].textContent+='done';
 divs[2].textContent='Compressing...';
-const compressed=await zopfli(original);
+const compressed=await gzip(original);
 divs[2].textContent+=`done (${compressed.byteLength} B)`;
 divs[3].textContent='Decompressing...';
 const decompressed=await gunzip(compressed);
 divs[3].textContent+=`done (${decompressed.byteLength} B)`;
 divs[4].textContent='Comparing...';
 const len=decompressed.byteLength;
-let same=len===original.byteLength;
+let same=len===10_000;
 if(same){
   for(let i=0;i<len;++i){
     if(decompressed[i]!==original[i]){

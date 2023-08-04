@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Zopfli on an encrypted file</title>
+<title>Gzip on an encrypted file</title>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
 html{height:100%;font:4vmin monospace;background:#222;color:#eee}
@@ -25,7 +25,7 @@ main>div{height:2rem}
 </main>
 </body>
 <script type="module">
-const mod=import('./zopfli.mjs');
+const mod=import('./gz.mjs');
 const divs=[...document.querySelectorAll('main>div')];
 divs[0].textContent='Fetching data...';
 const original=new Uint8Array(await(await fetch('./zopfli.wasm.br')).arrayBuffer());
@@ -36,10 +36,10 @@ const key=await crypto.subtle.generateKey({name:'AES-GCM',length:256},true,['enc
 const encrypted=new Uint8Array(await crypto.subtle.encrypt({name:'AES-GCM',iv},key,original));
 divs[1].textContent+='done';
 divs[2].textContent='Initializing compressor...';
-const {zopfli,gunzip}=await mod;
+const {gzip,gunzip}=await mod;
 divs[2].textContent+='done';
 divs[3].textContent='Compressing...';
-const compressed=await zopfli(encrypted);
+const compressed=await gzip(encrypted);
 divs[3].textContent+=`done (${compressed.byteLength} B)`;
 divs[4].textContent='Decompressing...';
 const decompressed=await gunzip(compressed);

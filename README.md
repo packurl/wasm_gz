@@ -1,6 +1,8 @@
-[WASM](https://developer.mozilla.org/en-US/docs/WebAssembly) libs for [zopfli](https://github.com/google/zopfli) deflate compression and inflate decompression.
+[WASM](https://developer.mozilla.org/en-US/docs/WebAssembly) libs for [zopfli](https://github.com/google/zopfli) gzip compression and (g)unzip decompression.
 
-This is a simple wrapper on top of the [brotli](https://github.com/zopfli-rs/zopfli) [rust](https://www.rust-lang.org/) [crate](https://crates.io/crates/zopfli) for the compression and the [miniz_oxide](https://github.com/Frommi/miniz_oxide) [rust](https://www.rust-lang.org/) [crate](https://crates.io/crates/miniz_oxide) for the decompression.
+This is a simple wrapper on top of the [zopfli](https://github.com/zopfli-rs/zopfli) [rust](https://www.rust-lang.org/) [crate](https://crates.io/crates/zopfli) for the compression and the [miniz_oxide](https://github.com/Frommi/miniz_oxide) [rust](https://www.rust-lang.org/) [crate](https://crates.io/crates/miniz_oxide) for the decompression.
+
+The handling of the [gzip](https://docs.fileformat.com/compression/gz/) header and footer is done in this crate to save a few bytes on the wasm files. 
 
 <br>
 

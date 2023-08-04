@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Compare Gzip compression levels</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+html{height:100%;font:2vmin monospace;background:#222;color:#eee}
+body{min-height:100%;padding:1rem;display:grid;place-items:center;grid-template-columns:auto}
+main{display:grid;grid-template-columns:auto;grid-template-rows:repeat(12,2em)}
+body.dragover::before{
+  content:'';
+  position:absolute;
+  inset:1rem;
+  background:rgba(200,200,200,.1);
+  border:2px solid rgba(200,200,200,.25);
+}
+main a{color:#adf}
+main:not(:empty){font-size:67%}
+main.ready:not(.busy):empty::after{
+  content:'Drag a file here';
+  align-self:center;
+  justify-self:center;
+  grid-row:1 / span 12;
+  font-style:italic;
+  opacity:.5;
+}
+main.busy::after{
+  content:'';
+  display:inline-block;
+  width:2rem;height:2rem;
+  align-self:center;
+  justify-self:center;
+  grid-row:1 / span 12;
+  grid-column:1;
+  border-radius:50%;
+  border:.1rem solid rgba(200,200,200,.5);
+  border-top-color:rgb(200,200,200);
+  animation:spin 1s ease-in-out infinite;
+  will-change:transform;
+}
+main>div{grid-column:1}
+main>div:nth-child(1){grid-row:1}
+main>div:nth-child(2){grid-row:2}
+main>div:nth-child(3){grid-row:3}
+main>div:nth-child(4){grid-row:4}
+main>div:nth-child(5){grid-row:5}
+main>div:nth-child(6){grid-row:6}
+main>div:nth-child(7){grid-row:7}
+main>div:nth-child(8){grid-row:8}
+main>div:nth-child(9){grid-row:9}
+main>div:nth-child(10){grid-row:10}
+main>div:nth-child(11){grid-row:11}
+main>div:nth-child(12){grid-row:12}
+@keyframes spin{
+  to{transform:rotate(360deg)}
+}
+</style>
+</head>
+<body>
+<main></main>
+</body>
+<script type="module">
+const url=new URL('gzip_zopfli.wasm',import.meta.url);
+await (await fetch(url)).arrayBuffer();
+const levels=[0,1,2,3,4,5,6,7,8,9,10,11];
+const gzip=async(bytes,level)=>{
+  const worker=new Worker(new URL('./gzip_zopfli_worker_script.mjs',import.meta.url),{type:'module'});
+  await new Promise(r=>worker.onmessage=msg=>{
+    if(msg.data==='ready'){
+      worker.onmessage=null;
+      r(worker);
+    }
+  });
+  const t=Date.now();
+  const compressed=await new Promise(r=>{
+    worker.onmessage=msg=>{
+      worker.onmessage=null;
+      r(msg.data);
+      worker.terminate();
+    }
+    worker.postMessage(level===11?{bytes,zopfli:true}:{bytes,level});
+  });
+  return {duration:Date.now()-t,bytes:compressed};
+};
+const gunzip=async(bytes)=>{
+  const worker=new Worker(new URL('./gzip_zopfli_worker_script.mjs',import.meta.url),{type:'module'});
+  await new Promise(r=>worker.onmessage=msg=>{
+    if(msg.data==='ready'){
+      worker.onmessage=null;
+      r(worker);
+    }
+  });
+  const t=Date.now();
+  const decompressed=await new Promise(r=>{
+    worker.onmessage=msg=>{
+      worker.onmessage=null;
+      r(msg.data);
+      worker.terminate();
+    }
+    worker.postMessage(bytes);
+  });
+  return {duration:Date.now()-t,bytes:decompressed};
+};
+const main=document.querySelector('main');
+main.classList.add('ready');
+['dragenter','dragover','dragleave','drop'].forEach(it=>{
+  window.addEventListener(it,e=>{
+    e.preventDefault();e.stopPropagation();document.body.classList.remove('dragover');
+  },false);
+});
+const dragListener=e=>{
+  e.dataTransfer.dropEffect='copy';
+  document.body.classList.add('dragover');
+};
+window.addEventListener('dragover',dragListener,false);
+const read=file=>new Promise(r=>{
+  const reader=new FileReader();
+  reader.onloadend=()=>r(new Uint8Array(reader.result));
+  reader.readAsArrayBuffer(file);
+});
+const dropListener=async e=>{
+  main.textContent='';
+  main.classList.add('busy');
+  window.removeEventListener('dragover',dragListener);
+  window.removeEventListener('drop',dropListener);
+  const file=e.dataTransfer.files.item(0);
+  for(const level of levels){
+    console.log(level);
+    const original=await read(file);
+    const {duration:compressionTime,bytes:compressed}=await gzip(original,level);
+    const blob=new Blob([compressed],{type:'octet/stream'});
+    const url=await new Promise((resolve,reject)=>{
+      const reader=new FileReader();
+      reader.addEventListener('load',e=>resolve(e.target.result));
+      reader.addEventListener('error',reject);
+      reader.readAsDataURL(blob);
+    });
+    const div=document.createElement('div');
+    const a=document.createElement('a');
+    a.href=url;
+    a.download=`${file.name}_${level===11?'z':level}.gz`;
+    a.textContent=`${file.name}_${level===11?'z':level}.gz`;
+    div.appendChild(a);
+    const spacer=level!==10?'\xa0':'';
+    div.innerHTML+=` ${spacer}${compressed.byteLength.toString().padStart(10,'\xa0')} B, compressed in ${(compressionTime/1000).toPrecision(3).replace(/^([0-9]+[.][0-9][0-9]*?)0+$/,'$1').padStart(6,'\xa0')} s`;
+    main.appendChild(div);
+    const {duration:decompressionTime,bytes:decompressed}=await gunzip(compressed);
+    div.innerHTML+=`, decompressed in ${(decompressionTime/1000).toPrecision(3).replace(/^([0-9]+[.][0-9][0-9]*?)0+$/,'$1').padStart(6,'\xa0')} s`;
+    if(decompressed.length!==original.length) throw new Error(`Expected length of ${original.length} but got ${decompressed.length}`);
+  }
+  main.classList.remove('busy');
+  window.addEventListener('dragover',dragListener,false);
+  window.addEventListener('drop',dropListener,false);
+};
+window.addEventListener('drop',dropListener,false);
+</script>
+</html>
