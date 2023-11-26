@@ -1,7 +1,7 @@
 const gzip=(async()=>{
-  const mod=await WebAssembly.compileStreaming(await fetch('./gzip.wasm',{cache:'force-cache'}));
-  const wasm=(await WebAssembly.instantiate(mod)).exports;
-  const malloc=wasm.__wbindgen_malloc;const free=wasm.__wbindgen_free;
+  const {instance:{exports:wasm}}=await WebAssembly.instantiateStreaming(await fetch('./gzip.wasm',{cache:'force-cache'}),{wbg:{}});
+  const malloc=wasm.__wbindgen_malloc;
+  const free=wasm.__wbindgen_free;
   const pointer=wasm.__wbindgen_add_to_stack_pointer;
   return (it,level)=>{
     const n1=it.length;

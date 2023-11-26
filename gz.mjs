@@ -1,7 +1,7 @@
 const url=new URL('./gz.wasm',import.meta.url);
-const mod=await WebAssembly.compileStreaming(await fetch(url,{cache:'force-cache'}));
-const wasm=(await WebAssembly.instantiate(mod)).exports;
-const malloc=wasm.__wbindgen_malloc;const free=wasm.__wbindgen_free;
+const {instance:{exports:wasm}}=await WebAssembly.instantiateStreaming(await fetch(url,{cache:'force-cache'}),{wbg:{}});
+const malloc=wasm.__wbindgen_malloc;
+const free=wasm.__wbindgen_free;
 const pointer=wasm.__wbindgen_add_to_stack_pointer;
 /**
  * Decompresses an array of bytes compressed with Gzip (or Zopfli).

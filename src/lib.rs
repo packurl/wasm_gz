@@ -112,7 +112,7 @@ pub fn gzip(data: &[u8], level: u8) -> Vec<u8> {
 #[wasm_bindgen]
 pub fn zopfli(data: &[u8]) -> Vec<u8> {
     let mut compressed = Vec::with_capacity(data.len() + 64);
-    compress(&Options::default(), &Format::Deflate, data, &mut compressed).unwrap();
+    compress(Options::default(), Format::Deflate, data, &mut compressed).unwrap();
     let mut hasher = Hasher::new();
     hasher.update(&data);
     let crc = hasher.finalize();
