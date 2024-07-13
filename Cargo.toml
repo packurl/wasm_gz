@@ -1,6 +1,6 @@
 [package]
 name = "gzip_zopfli"
-version = "0.5.2"
+version = "0.5.3"
 authors = ["programingjd"]
 edition = "2021"
 
