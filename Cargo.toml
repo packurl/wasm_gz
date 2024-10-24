@@ -1,14 +1,14 @@
 [package]
 name = "gzip_zopfli"
-version = "0.5.3"
+version = "0.6.0"
 authors = ["programingjd"]
 edition = "2021"
 
 [lib]
-crate-type = ["cdylib","rlib"]
+crate-type = ["cdylib", "rlib"]
 
 [dependencies.wasm-bindgen]
-version = "0.2"
+version = "0.2.95"
 
 [dependencies.zopfli]
 version = "0.8"
@@ -16,7 +16,7 @@ default-features = false
 features = ["std"]
 
 [dependencies.miniz_oxide]
-version = "0.7"
+version = "0.8"
 
 [dependencies.crc32fast]
 version = "1.4"
