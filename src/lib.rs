@@ -2,7 +2,7 @@ use crc32fast::Hasher;
 use miniz_oxide::deflate::compress_to_vec;
 use miniz_oxide::inflate::decompress_to_vec;
 use wasm_bindgen::prelude::*;
-// use zopfli::{compress, Format, Options};
+use zopfli::{Format, Options, compress};
 
 #[wasm_bindgen]
 pub fn gunzip(data: &[u8]) -> Vec<u8> {
@@ -109,12 +109,12 @@ pub fn gzip(data: &[u8], level: u8) -> Vec<u8> {
     gzip_wrap(crc, data.len() as u32, compressed)
 }
 
-// #[wasm_bindgen]
-// pub fn zopfli(data: &[u8]) -> Vec<u8> {
-//     let mut compressed = Vec::with_capacity(data.len() + 64);
-//     compress(Options::default(), Format::Deflate, data, &mut compressed).unwrap();
-//     let mut hasher = Hasher::new();
-//     hasher.update(&data);
-//     let crc = hasher.finalize();
-//     gzip_wrap(crc, data.len() as u32, compressed)
-// }
+#[wasm_bindgen]
+pub fn zopfli(data: &[u8]) -> Vec<u8> {
+    let mut compressed = Vec::with_capacity(data.len() + 64);
+    compress(Options::default(), Format::Deflate, data, &mut compressed).unwrap();
+    let mut hasher = Hasher::new();
+    hasher.update(&data);
+    let crc = hasher.finalize();
+    gzip_wrap(crc, data.len() as u32, compressed)
+}

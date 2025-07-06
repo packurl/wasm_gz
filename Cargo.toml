@@ -1,14 +1,43 @@
 [package]
-name = "gzip_zopfli"
-version = "0.6.0"
-authors = ["programingjd"]
-edition = "2021"
+name = "wasm_gz"
+version = "0.7.0"
+edition = "2024"
+authors = ["Jerome David <programingjd@gmail.com>"]
+categories = ["wasm", "compression"]
+description = "esm modules for gzip compression and/or decompression, with sync and async (worker) versions"
+keywords = ["wasm", "gzip", "gz", "gunzip", "zopfli"]
+license = "Apache-2.0"
+repository = "https://github.com/packurl/wasm_gz"
+include = [
+    "Cargo.toml", "src", "LICENSE", "README.md",
+    "gunzip.d.ts", "gunzip.mjs", "gunzip.wasm",
+    "gunzip_worker.d.ts", "gunzip_worker.mjs", "gunzip_worker_script.mjs",
+    "gunzip_worker_script.js", "gunzip_for_importScript.mjs",
+    "gzip.d.ts", "gzip.mjs", "gzip.wasm",
+    "gzip_worker_enc.d.ts", "gzip_worker_enc.mjs", "gzip_worker_script.mjs",
+    "gzip_worker_script.js", "gzip_for_importScript.mjs",
+    "gz.d.ts", "gz.mjs", "gz.wasm",
+    "gz_worker.d.ts", "gz_worker.mjs", "gz_worker_script.mjs",
+    "gz_worker_script.js", "gz_for_importScript.mjs",
+    "zopfli.d.ts", "zopfli.mjs", "zopfli.wasm",
+    "zopfli_worker.d.ts", "zopfli_worker.mjs", "zopfli_worker_script.mjs",
+    "zopfli_worker_script.js", "zopfli_for_importScript.mjs",
+    "zopfli_enc.d.ts", "zopfli_enc.mjs", "zopfli_enc.wasm",
+    "zopfli_enc_worker.d.ts", "zopfli_enc_worker.mjs", "zopfli_enc_worker_script.mjs",
+    "zopfli_enc_worker_script.js", "zopfli_enc_for_importScript.mjs",
+    "gzip_zopfli.d.ts", "gzip_zopfli.mjs", "gzip_zopfli.wasm",
+    "gzip_zopfli_worker.d.ts", "gzip_zopfli_worker.mjs", "gzip_zopfli_worker_script.mjs",
+    "gzip_zopfli_worker_script.js", "gzip_zopfli_for_importScript.mjs",
+    "test1.html", "test2.html", "test3.html",
+    "test4.html", "test5.html", "test6.html",
+    "compress_zopfli.html", "compress_compare.html", "compress_gzip.html", "decompress.html"
+]
 
 [lib]
 crate-type = ["cdylib", "rlib"]
 
 [dependencies.wasm-bindgen]
-version = "0.2.95"
+version = "0.2"
 
 [dependencies.zopfli]
 version = "0.8"
@@ -24,7 +53,19 @@ default-features = false
 features = ["std"]
 
 [profile.release]
-debug = false
 opt-level = "s"
-lto = true
+lto = "fat"
+codegen-units = 1
+
+#[profile.release]
+#debug = false
+#opt-level = "z"
+#lto = "thin"
+#codegen-units = 1
+
+[profile.custom]
+inherits = "release"
+opt-level = "z"
+lto = "thin"
+codegen-units = 1
 #panic = "abort"

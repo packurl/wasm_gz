@@ -12,8 +12,8 @@ body.dragover::before{
   content:'';
   position:absolute;
   inset:1rem;
-  background:rgba(200,200,200,.1);
-  border:2px solid rgba(200,200,200,.25);
+  background:rgba(200, 200, 200, .1);
+  border:2px solid rgba(200, 200, 200, .25);
 }
 main a{color:#adf}
 main:not(:empty){font-size:67%}
@@ -27,8 +27,8 @@ main.busy::before{
   display:inline-block;
   width:2rem;height:2rem;
   border-radius:50%;
-  border:.1rem solid rgba(200,200,200,.5);
-  border-top-color:rgb(200,200,200);
+  border:.1rem solid rgba(200, 200, 200, .5);
+  border-top-color:rgb(200, 200, 200);
   animation:spin 1s ease-in-out infinite;
   will-change:transform;
 }
@@ -46,7 +46,9 @@ const main=document.querySelector('main');
 main.classList.add('ready');
 ['dragenter','dragover','dragleave','drop'].forEach(it=>{
   window.addEventListener(it,e=>{
-    e.preventDefault();e.stopPropagation();document.body.classList.remove('dragover');
+    e.preventDefault();
+    e.stopPropagation();
+    document.body.classList.remove('dragover');
   },false);
 });
 const dragListener=e=>{
@@ -66,7 +68,7 @@ const dropListener=async e=>{
   window.removeEventListener('drop',dropListener);
   const file=e.dataTransfer.files.item(0);
   const decompressed=await gunzip(await read(file));
-  const blob=new Blob([decompressed],{type:'octet/stream'});
+  const blob=new Blob([decompressed],{type: 'octet/stream'});
   const url=await new Promise((resolve,reject)=>{
     const reader=new FileReader();
     reader.addEventListener('load',e=>resolve(e.target.result));
